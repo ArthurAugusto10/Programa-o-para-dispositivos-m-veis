@@ -1,63 +1,101 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, KeyboardAvoidingView, Platform } from 'react-native';
+import { CustomInput } from '../components/CustomInput';
+import { CustomButton } from '../components/CustomButton';
+import { Colors, Spacing } from '../styles/globalStyles';
 
 export default function LoginScreen({ navigation }: any) {
-  // Estados para os campos obrigatórios [cite: 80, 81, 82]
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+    const [email, setEmail] = useState('');
+    const [senha, setSenha] = useState('');
+    const [documento, setDocumento] = useState('');
+    const [perfil, setPerfil] = useState<'Aluno' | 'Professor' | 'Adm'>('Aluno');
 
-  const handleLogin = () => {
-    // Validação de campos vazios [cite: 85]
-    if (email === '' || password === '') {
-      setError('Por favor, preencha todos os campos.');
-      return;
-    }
+    const handleLogin = () => {
+        if (!email || !senha || !documento) {
+            Alert.alert("Erro", "Preencha todos os campos.");
+            return;
+        }
+        console.log(`Login realizado como ${perfil}:`, { email, documento });
 
-    // Reset de erro e login simulado [cite: 17, 86]
-    setError('');
-    console.log("Login realizado com:", email);
-    
-    // Redirecionamento para a tela principal 
-    navigation.replace('Dashboard');
-  };
+        // Navegação para o Dashboard
+        navigation.navigate('Dashboard', { perfilUsuario: perfil });
+    };
 
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>App Scholar</Text>
-      
-      <TextInput
-        style={styles.input}
-        placeholder="Login ou Email"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
+    const RadioButton = ({ label, value }: { label: string, value: typeof perfil }) => (
+        <TouchableOpacity
+            style={styles.radioContainer}
+            onPress={() => setPerfil(value)}
+        >
+            <View style={[styles.radioCircle, perfil === value && styles.selectedCircle]} />
+            <Text style={styles.radioLabel}>{label}</Text>
+        </TouchableOpacity>
+    );
 
-      <TextInput
-        style={styles.input}
-        placeholder="Senha"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-      />
+    return (
+        <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            style={styles.container}
+        >
+            <View style={styles.card}>
+                <Text style={styles.title}>App Scholar</Text>
+                <Text style={styles.subtitle}>Selecione seu perfil:</Text>
 
-      {/* Exibição da mensagem de erro [cite: 85] */}
-      {error ? <Text style={styles.errorText}>{error}</Text> : null}
+                <View style={styles.perfilRow}>
+                    <RadioButton label="Aluno" value="Aluno" />
+                    <RadioButton label="Professor" value="Professor" />
+                    <RadioButton label="Adm" value="Adm" />
+                </View>
 
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Acessar</Text>
-      </TouchableOpacity>
-    </View>
-  );
+                <CustomInput
+                    label="E-mail"
+                    placeholder="exemplo@fatec.sp.gov.br"
+                    value={email}
+                    onChangeText={setEmail}
+                    keyboardType="email-address"
+                />
+
+                <CustomInput
+                    label="Número do Documento (CPF/RA)"
+                    placeholder="Digite seu documento"
+                    value={documento}
+                    onChangeText={setDocumento}
+                    keyboardType="numeric"
+                />
+
+                <CustomInput
+                    label="Senha"
+                    placeholder="******"
+                    value={senha}
+                    onChangeText={setSenha}
+                    secureTextEntry
+                />
+
+                <CustomButton title="Acessar Sistema" onPress={handleLogin} color={Colors.primary} />
+
+
+                <View style={styles.footerLinks}>
+                    <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
+                        <Text style={styles.linkText}>Esqueci a senha</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+                        <Text style={styles.linkText}>Criar conta</Text>
+                    </TouchableOpacity>
+                </View>
+            </View>
+        </KeyboardAvoidingView>
+    );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', padding: 20, backgroundColor: '#f5f5f5' },
-  title: { fontSize: 24, fontWeight: 'bold', textAlign: 'center', marginBottom: 30, color: '#333' },
-  input: { backgroundColor: '#fff', padding: 15, borderRadius: 8, marginBottom: 15, borderWidth: 1, borderColor: '#ddd' },
-  button: { backgroundColor: '#007AFF', padding: 15, borderRadius: 8, alignItems: 'center' },
-  buttonText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
-  errorText: { color: 'red', marginBottom: 15, textAlign: 'center' }
+    container: { flex: 1, backgroundColor: Colors.background, justifyContent: 'center', padding: 20 },
+    card: { backgroundColor: '#fff', padding: 25, borderRadius: 15, elevation: 5 },
+    title: { fontSize: 26, fontWeight: 'bold', textAlign: 'center', color: Colors.primary, marginBottom: 10 },
+    subtitle: { fontSize: 14, color: '#666', marginBottom: 15, textAlign: 'center' },
+    perfilRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 20 },
+    radioContainer: { flexDirection: 'row', alignItems: 'center' },
+    radioCircle: { height: 18, width: 18, borderRadius: 9, borderWidth: 2, borderColor: Colors.primary, marginRight: 8 },
+    selectedCircle: { backgroundColor: Colors.primary },
+    radioLabel: { fontSize: 14, color: '#444' },
+    footerLinks: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 20 },
+    linkText: { color: Colors.primary, fontSize: 12, fontWeight: 'bold' }
 });

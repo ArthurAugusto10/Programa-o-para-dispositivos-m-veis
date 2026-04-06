@@ -1,103 +1,59 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, FlatList } from 'react-native';
 import { CustomInput } from '../components/CustomInput';
 import { CustomButton } from '../components/CustomButton';
-import { useForm } from '../hooks/useForm';
 import { Colors, Spacing } from '../styles/globalStyles';
 
-export default function StudentRegisterScreen() {
-  // Inicializando o formulário com os campos obrigatórios do PDF [cite: 101, 102, 103, 104, 105, 106, 107, 108, 111, 112]
-  const { values, handleChange } = useForm({
-    nome: '',
-    matricula: '',
-    curso: '',
-    email: '',
-    telefone: '',
-    cep: '',
-    endereco: '',
-    cidade: '',
-    estado: ''
-  });
+export default function StudentRegisterScreen({ route }: any) {
+  const { perfilUsuario } = route.params || { perfilUsuario: 'Aluno' };
+  const podeCadastrar = perfilUsuario === 'Adm' || perfilUsuario === 'Professor';
 
-  const handleSave = () => {
-    // Validação de campos obrigatórios [cite: 51]
-    if (!values.nome || !values.matricula || !values.email) {
-      Alert.alert("Erro", "Por favor, preencha os campos obrigatórios (Nome, Matrícula e Email).");
-      return;
-    }
-
-    // Exibição dos dados conforme permitido na Parte 1 [cite: 113]
-    console.log("Cadastro de Aluno realizado:", values);
-    Alert.alert("Sucesso", "Dados do aluno salvos temporariamente!");
-  };
+  const alunosMock = [
+    { id: '1', nome: 'Arthur Augusto', curso: 'DSM', ra: '123456' },
+    { id: '2', nome: 'Mariana Silva', curso: 'DSM', ra: '654321' },
+  ];
 
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.sectionTitle}>Informações Acadêmicas</Text>
-      
-      <CustomInput 
-        label="Nome Completo" 
-        placeholder="Digite o nome do aluno" 
-        value={values.nome} 
-        onChangeText={(text) => handleChange('nome', text)} 
-      />
-      
-      <CustomInput 
-        label="Matrícula" 
-        placeholder="Ex: 123456" 
-        value={values.matricula} 
-        onChangeText={(text) => handleChange('matricula', text)} 
-        keyboardType="numeric" 
-      />
+    <View style={styles.container}>
+      <Text style={styles.title}>
+        {podeCadastrar ? "Gerenciamento de Alunos" : "Meus Colegas de Curso"}
+      </Text>
 
-      <CustomInput 
-        label="Curso" 
-        placeholder="Ex: DSM - Fatec Jacareí" 
-        value={values.curso} 
-        onChangeText={(text) => handleChange('curso', text)} 
-      />
-
-      <Text style={styles.sectionTitle}>Contato e Localização</Text>
-
-      <CustomInput 
-        label="E-mail" 
-        placeholder="aluno@fatec.sp.gov.br" 
-        value={values.email} 
-        onChangeText={(text) => handleChange('email', text)} 
-        keyboardType="email-address" 
-      />
-
-      <CustomInput 
-        label="CEP" 
-        placeholder="00000-000" 
-        value={values.cep} 
-        onChangeText={(text) => handleChange('cep', text)} 
-        keyboardType="numeric" 
-      />
-
-      {/* Botão padronizado utilizando nosso componente global  */}
-      <CustomButton 
-        title="Salvar Cadastro" 
-        onPress={handleSave} 
-        color={Colors.success} 
-      />
-      
-      <View style={{ height: 40 }} />
-    </ScrollView>
+      {podeCadastrar ? (
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <CustomInput label="Nome do Aluno" placeholder="Nome completo" value="" onChangeText={() => {}} />
+          <CustomInput label="RA / Matrícula" placeholder="Ex: 0040..." value="" onChangeText={() => {}} keyboardType="numeric" />
+          <CustomInput label="Curso" placeholder="Ex: DSM" value="" onChangeText={() => {}} />
+          <CustomButton title="Registrar Aluno" onPress={() => {}} color={Colors.primary} />
+          
+          <Text style={[styles.title, { marginTop: 30 }]}>Alunos Cadastrados</Text>
+          {alunosMock.map(item => (
+            <View key={item.id} style={styles.card}>
+              <Text style={styles.name}>{item.nome}</Text>
+              <Text style={styles.info}>RA: {item.ra} | Curso: {item.curso}</Text>
+            </View>
+          ))}
+        </ScrollView>
+      ) : (
+        <FlatList 
+          data={alunosMock}
+          keyExtractor={item => item.id}
+          renderItem={({ item }) => (
+            <View style={styles.card}>
+              <Text style={styles.name}>{item.nome}</Text>
+              <Text style={styles.info}>Curso: {item.curso}</Text>
+            </View>
+          )}
+        />
+      )}
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { 
-    flex: 1, 
-    padding: Spacing.padding, 
-    backgroundColor: Colors.background 
-  },
-  sectionTitle: { 
-    fontSize: 18, 
-    fontWeight: 'bold', 
-    color: Colors.primary, 
-    marginBottom: 15, 
-    marginTop: 10 
-  }
+  container: { flex: 1, padding: Spacing.padding, backgroundColor: Colors.background },
+  title: { fontSize: 20, fontWeight: 'bold', marginBottom: 20, color: Colors.primary },
+  card: { backgroundColor: '#fff', padding: 15, borderRadius: 10, marginBottom: 10, elevation: 2 },
+  name: { fontSize: 16, fontWeight: 'bold' },
+  info: { fontSize: 14, color: '#666' }
 });

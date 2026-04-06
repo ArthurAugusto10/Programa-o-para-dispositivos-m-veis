@@ -9,6 +9,8 @@ import StudentRegisterScreen from '../screens/StudentRegisterScreen';
 import TeacherRegisterScreen from '../screens/TeacherRegisterScreen';
 import SubjectRegisterScreen from '../screens/SubjectRegisterScreen';
 import ReportCardScreen from '../screens/ReportCardScreen';
+import ForgotPasswordScreen from '../screens/ForgotPasswordScreen';
+import RegisterScreen from '../screens/RegisterScreen';
 
 const Stack = createStackNavigator();
 
@@ -65,6 +67,18 @@ export default function AppNavigation() {
           name="VisualizacaoBoletim" 
           component={ReportCardScreen} 
           options={{ title: 'Boletim Acadêmico' }} 
+        />
+
+        <Stack.Screen 
+          name="ForgotPassword" 
+          component={ForgotPasswordScreen} 
+          options={{ title: 'Recuperar Senha' }}
+        />
+
+        <Stack.Screen 
+          name="Register" 
+          component={RegisterScreen} 
+          options={{ title: 'Criar Conta' }} 
         />
       </Stack.Navigator>
     </NavigationContainer>

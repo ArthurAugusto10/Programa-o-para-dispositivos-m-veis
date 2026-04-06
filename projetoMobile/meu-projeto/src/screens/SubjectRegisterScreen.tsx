@@ -1,83 +1,67 @@
 import React from 'react';
-import { ScrollView, Text, StyleSheet, Alert, View } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, FlatList } from 'react-native';
 import { CustomInput } from '../components/CustomInput';
 import { CustomButton } from '../components/CustomButton';
-import { useForm } from '../hooks/useForm';
 import { Colors, Spacing } from '../styles/globalStyles';
 
-export default function SubjectRegisterScreen() {
-  const { values, handleChange } = useForm({
-    nomeDisciplina: '',
-    cargaHoraria: '',
-    professorResponsavel: '',
-    curso: '',
-    semestre: ''
-  });
+export default function SubjectRegisterScreen({ route }: any) {
+  // Recebe o perfil vindo do Dashboard
+  const { perfilUsuario } = route.params || { perfilUsuario: 'Aluno' };
+  
+  // Define quem pode cadastrar (Adm e Professor)
+  const podeEditar = perfilUsuario === 'Adm' || perfilUsuario === 'Professor';
 
-  const handleSave = () => {
-    if (!values.nomeDisciplina || !values.curso) {
-      Alert.alert("Erro", "O nome da disciplina e o curso são obrigatórios.");
-      return;
-    }
-
-    console.log("Disciplina cadastrada:", values); // Dados temporários [cite: 64, 113]
-    Alert.alert("Sucesso", "Disciplina registrada no sistema!");
-  };
+  // Lista simulada para consulta do aluno
+  const disciplinasMock = [
+    { id: '1', nome: 'Estrutura de Dados', carga: '80h', professor: 'André Olímpio' },
+    { id: '2', nome: 'Interação Humano Computador', carga: '40h', professor: 'Carlos Silva' },
+    { id: '3', nome: 'Banco de Dados II', carga: '80h', professor: 'Marta Souza' },
+  ];
 
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.title}>Nova Disciplina</Text>
+    <View style={styles.container}>
+      <Text style={styles.title}>
+        {podeEditar ? "Gerenciar Disciplinas" : "Grade Curricular"}
+      </Text>
 
-      <CustomInput 
-        label="Nome da Disciplina" 
-        placeholder="Ex: Programação para Dispositivos Móveis I" 
-        value={values.nomeDisciplina} 
-        onChangeText={(text) => handleChange('nomeDisciplina', text)} 
-      />
-
-      <View style={styles.row}>
-        <View style={{ flex: 1, marginRight: 10 }}>
-          <CustomInput 
-            label="Carga Horária" 
-            placeholder="Ex: 80" 
-            value={values.cargaHoraria} 
-            onChangeText={(text) => handleChange('cargaHoraria', text)} 
-            keyboardType="numeric" 
-          />
-        </View>
-        <View style={{ flex: 1 }}>
-          <CustomInput 
-            label="Semestre" 
-            placeholder="Ex: 5" 
-            value={values.semestre} 
-            onChangeText={(text) => handleChange('semestre', text)} 
-            keyboardType="numeric" 
-          />
-        </View>
-      </View>
-
-      <CustomInput 
-        label="Professor Responsável" 
-        placeholder="Selecione o professor" 
-        value={values.professorResponsavel} 
-        onChangeText={(text) => handleChange('professorResponsavel', text)} 
-      />
-
-      <CustomInput 
-        label="Curso" 
-        placeholder="Ex: DSM" 
-        value={values.curso} 
-        onChangeText={(text) => handleChange('curso', text)} 
-      />
-
-      <CustomButton title="Salvar Disciplina" onPress={handleSave} color={Colors.secondary} />
-      <View style={{ height: 30 }} />
-    </ScrollView>
+      {podeEditar ? (
+        // VISÃO DO ADM / PROFESSOR: Formulário de Cadastro
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <CustomInput label="Nome da Disciplina" placeholder="Ex: Cálculo I" value="" onChangeText={() => {}} />
+          <CustomInput label="Carga Horária" placeholder="Ex: 80" value="" onChangeText={() => {}} keyboardType="numeric" />
+          <CustomInput label="Professor Responsável" placeholder="Nome do docente" value="" onChangeText={() => {}} />
+          <CustomButton title="Salvar Disciplina" onPress={() => {}} color={Colors.success} />
+          
+          <Text style={[styles.title, { marginTop: 30 }]}>Disciplinas Atuais</Text>
+          {disciplinasMock.map(item => (
+            <View key={item.id} style={styles.card}>
+              <Text style={styles.name}>{item.nome}</Text>
+              <Text style={styles.info}>{item.professor} | {item.carga}</Text>
+            </View>
+          ))}
+        </ScrollView>
+      ) : (
+        // VISÃO DO ALUNO: Apenas Lista de Consulta
+        <FlatList 
+          data={disciplinasMock}
+          keyExtractor={item => item.id}
+          renderItem={({ item }) => (
+            <View style={styles.card}>
+              <Text style={styles.name}>{item.nome}</Text>
+              <Text style={styles.info}>Prof. {item.professor}</Text>
+              <Text style={styles.info}>Carga Horária: {item.carga}</Text>
+            </View>
+          )}
+        />
+      )}
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: Spacing.padding, backgroundColor: Colors.background },
-  title: { fontSize: 20, fontWeight: 'bold', color: Colors.text, marginBottom: 20 },
-  row: { flexDirection: 'row' }
+  title: { fontSize: 20, fontWeight: 'bold', marginBottom: 20, color: Colors.primary },
+  card: { backgroundColor: '#fff', padding: 15, borderRadius: 10, marginBottom: 10, elevation: 2 },
+  name: { fontSize: 16, fontWeight: 'bold', color: '#333' },
+  info: { fontSize: 14, color: '#666', marginTop: 2 }
 });
