@@ -19,6 +19,8 @@ export default function DashboardScreen({ route, navigation }: any) {
   );
 
   return (
+    
+    
     <ScrollView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.welcomeText}>Olá, {perfilUsuario}!</Text>
@@ -47,13 +49,13 @@ export default function DashboardScreen({ route, navigation }: any) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f0f2f5' },
+  container: { flex: 1, experimental_backgroundImage: '#f0f2f5' },
   header: { padding: 25, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#eee' },
   welcomeText: { fontSize: 22, fontWeight: 'bold', color: Colors.primary },
   subText: { fontSize: 14, color: '#666' },
   menuGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', padding: 15 },
   card: {
-    backgroundColor: '#fff',
+    backgroundColor: 'rgba(20, 22, 31, 0.9)',
     width: '48%',
     height: 140,
     borderRadius: 15,

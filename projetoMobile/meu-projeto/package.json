@@ -28,6 +28,7 @@
   },
   "devDependencies": {
     "@types/react": "~19.1.0",
+    "@types/styled-components": "^5.1.36",
     "typescript": "~5.9.2"
   },
   "private": true

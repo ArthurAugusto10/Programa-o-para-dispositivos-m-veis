@@ -3,7 +3,7 @@
 export const Colors = {
   // Fundo escuro profundo (Cyberpunk Base)
   background: '#0a0b10', 
-  cardBackground: '#14161f',
+  cardBackground: '#b6bacfff',
   
   // Cores Neon principais
   primary: '#6bc715',   // Ciano Glow (Principal)
@@ -23,4 +23,5 @@ export const Colors = {
 export const Spacing = {
   padding: 20,
   borderRadius: 10, // Menor borderRadius para um visual mais "quadrado/tech"
-};
+};  
+
