@@ -1,6 +1,6 @@
-import { Request, Response } from 'express';
-import { query } from '../database';
-import { Disciplina } from '../models/Disciplina';
+import type { Request, Response } from 'express';
+import { query } from '../database/index';
+import type { Disciplina } from '../models/Disciplina';
 
 class SubjectController {
   // Rota POST /api/disciplinas [cite: 99]

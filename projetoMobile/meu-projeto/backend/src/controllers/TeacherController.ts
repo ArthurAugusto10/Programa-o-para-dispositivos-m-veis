@@ -1,6 +1,6 @@
-import { Request, Response } from 'express';
+import type { Request, Response } from 'express';
 import { query } from '../database';
-import { Professor } from '../models/Professor';
+import type { Professor } from '../models/Professor';
 
 class TeacherController {
   // Rota POST /api/professores

@@ -12,6 +12,7 @@ import ReportCardScreen from '../screens/ReportCardScreen';
 import ForgotPasswordScreen from '../screens/ForgotPasswordScreen';
 import RegisterScreen from '../screens/RegisterScreen';
 
+
 const Stack = createStackNavigator();
 
 export default function AppNavigation() {

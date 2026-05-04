@@ -1,24 +1,50 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';
 import { CustomInput } from '../components/CustomInput';
 import { CustomButton } from '../components/CustomButton';
-import { Colors, Spacing } from '../styles/globalStyles';
+import { Colors } from '../styles/globalStyles';
+import api from '../services/api'; // Certifique-se de que este arquivo existe
 
 export default function LoginScreen({ navigation }: any) {
     const [email, setEmail] = useState('');
     const [senha, setSenha] = useState('');
     const [documento, setDocumento] = useState('');
     const [perfil, setPerfil] = useState<'Aluno' | 'Professor' | 'Adm'>('Aluno');
+    const [carregando, setCarregando] = useState(false);
 
-    const handleLogin = () => {
+    // FUNÇÃO DE LOGIN CONECTADA AO BACKEND
+    const handleLogin = async () => {
+        // Validação básica [cite: 78]
         if (!email || !senha || !documento) {
             Alert.alert("Erro", "Preencha todos os campos.");
             return;
         }
-        console.log(`Login realizado como ${perfil}:`, { email, documento });
 
-        // Navegação para o Dashboard
-        navigation.navigate('Dashboard', { perfilUsuario: perfil });
+        setCarregando(true);
+
+        try {
+            // API 1 - Autenticação [cite: 74, 76]
+            const response = await api.post('/login', {
+                email: email,      // state 'email'
+                senha: senha,      // state 'senha'
+                documento: documento // state 'documento'
+            });
+
+            // Resposta esperada conforme Página 2 do PDF 
+            const { token, usuario } = response.data;
+
+            console.log(`Login realizado como ${usuario.perfil}:`, usuario.nome);
+
+            // Navegação para o Dashboard usando o perfil retornado pelo banco [cite: 92]
+            navigation.navigate('Dashboard', { perfilUsuario: usuario.perfil });
+
+        } catch (error: any) {
+            console.error('Erro ao acessar:', error);
+            const mensagem = error.response?.data?.error || 'Erro ao conectar com o servidor';
+            Alert.alert('Falha no Login', mensagem);
+        } finally {
+            setCarregando(false);
+        }
     };
 
     const RadioButton = ({ label, value }: { label: string, value: typeof perfil }) => (
@@ -70,8 +96,11 @@ export default function LoginScreen({ navigation }: any) {
                     secureTextEntry
                 />
 
-                <CustomButton title="Acessar Sistema" onPress={handleLogin} color={Colors.primary} />
-
+                {carregando ? (
+                    <ActivityIndicator size="large" color={Colors.primary} />
+                ) : (
+                    <CustomButton title="Acessar Sistema" onPress={handleLogin} color={Colors.primary} />
+                )}
 
                 <View style={styles.footerLinks}>
                     <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
@@ -87,15 +116,15 @@ export default function LoginScreen({ navigation }: any) {
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: Colors.background, justifyContent: 'center', padding: 20 },
+    container: { flex: 1, backgroundColor: '#f0f2f5', justifyContent: 'center', padding: 20 },
     card: { backgroundColor: '#fff', padding: 25, borderRadius: 15, elevation: 5 },
-    title: { fontSize: 26, fontWeight: 'bold', textAlign: 'center', color: Colors.primary, marginBottom: 10 },
+    title: { fontSize: 26, fontWeight: 'bold', textAlign: 'center', color: '#007AFF', marginBottom: 10 },
     subtitle: { fontSize: 14, color: '#666', marginBottom: 15, textAlign: 'center' },
     perfilRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 20 },
     radioContainer: { flexDirection: 'row', alignItems: 'center' },
-    radioCircle: { height: 18, width: 18, borderRadius: 9, borderWidth: 2, borderColor: Colors.primary, marginRight: 8 },
-    selectedCircle: { backgroundColor: Colors.primary },
+    radioCircle: { height: 18, width: 18, borderRadius: 9, borderWidth: 2, borderColor: '#007AFF', marginRight: 8 },
+    selectedCircle: { backgroundColor: '#007AFF' },
     radioLabel: { fontSize: 14, color: '#444' },
     footerLinks: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 20 },
-    linkText: { color: Colors.primary, fontSize: 12, fontWeight: 'bold' }
+    linkText: { color: '#007AFF', fontSize: 12, fontWeight: 'bold' }
 });

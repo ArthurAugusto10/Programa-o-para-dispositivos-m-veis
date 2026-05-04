@@ -1,6 +1,6 @@
-import { Request, Response } from 'express';
+import type { Request, Response } from 'express';
 import { query } from '../database';
-import { Aluno } from '../models/Aluno';
+import type { Aluno } from '../models/Aluno';
 
 class StudentController {
  

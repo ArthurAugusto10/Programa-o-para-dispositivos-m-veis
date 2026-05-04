@@ -4,6 +4,7 @@ import cors from 'cors';
 import studentRoutes from './routes/studentRoutes';
 import teacherRoutes from './routes/teacherRoutes'; // Import novo
 import subjectRoutes from './routes/subjectRoutes'; // Import novo
+import authRoutes from './routes/authRoutes';
 
 const app = express();
 
@@ -14,6 +15,7 @@ app.use(express.json());
 app.use('/api', studentRoutes);
 app.use('/api', teacherRoutes);
 app.use('/api', subjectRoutes);
+app.use('/api', authRoutes);
 
 const PORT = process.env.PORT || 3000;
 
