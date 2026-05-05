@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Alert, KeyboardAvoidingView, 
 import { CustomInput } from '../components/CustomInput';
 import { CustomButton } from '../components/CustomButton';
 import { Colors } from '../styles/globalStyles';
-import api from '../services/api'; // Certifique-se de que este arquivo existe
+import api from '../services/api';
 
 export default function LoginScreen({ navigation }: any) {
     const [email, setEmail] = useState('');
@@ -12,9 +12,7 @@ export default function LoginScreen({ navigation }: any) {
     const [perfil, setPerfil] = useState<'Aluno' | 'Professor' | 'Adm'>('Aluno');
     const [carregando, setCarregando] = useState(false);
 
-    // FUNÇÃO DE LOGIN CONECTADA AO BACKEND
     const handleLogin = async () => {
-        // Validação básica [cite: 78]
         if (!email || !senha || !documento) {
             Alert.alert("Erro", "Preencha todos os campos.");
             return;
@@ -23,19 +21,16 @@ export default function LoginScreen({ navigation }: any) {
         setCarregando(true);
 
         try {
-            // API 1 - Autenticação [cite: 74, 76]
             const response = await api.post('/login', {
-                email: email,      // state 'email'
-                senha: senha,      // state 'senha'
-                documento: documento // state 'documento'
+                email: email,
+                senha: senha,
+                documento: documento
             });
 
-            // Resposta esperada conforme Página 2 do PDF 
             const { token, usuario } = response.data;
-
             console.log(`Login realizado como ${usuario.perfil}:`, usuario.nome);
 
-            // Navegação para o Dashboard usando o perfil retornado pelo banco [cite: 92]
+            // O perfil retornado pelo banco define o que o usuário verá no Dashboard
             navigation.navigate('Dashboard', { perfilUsuario: usuario.perfil });
 
         } catch (error: any) {
@@ -64,7 +59,7 @@ export default function LoginScreen({ navigation }: any) {
         >
             <View style={styles.card}>
                 <Text style={styles.title}>App Scholar</Text>
-                <Text style={styles.subtitle}>Selecione seu perfil:</Text>
+                <Text style={styles.subtitle}>Acesso Restrito - Selecione seu perfil:</Text>
 
                 <View style={styles.perfilRow}>
                     <RadioButton label="Aluno" value="Aluno" />
@@ -106,9 +101,6 @@ export default function LoginScreen({ navigation }: any) {
                     <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
                         <Text style={styles.linkText}>Esqueci a senha</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => navigation.navigate('Register')}>
-                        <Text style={styles.linkText}>Criar conta</Text>
-                    </TouchableOpacity>
                 </View>
             </View>
         </KeyboardAvoidingView>
@@ -125,6 +117,6 @@ const styles = StyleSheet.create({
     radioCircle: { height: 18, width: 18, borderRadius: 9, borderWidth: 2, borderColor: '#007AFF', marginRight: 8 },
     selectedCircle: { backgroundColor: '#007AFF' },
     radioLabel: { fontSize: 14, color: '#444' },
-    footerLinks: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 20 },
+    footerLinks: { alignItems: 'center', marginTop: 20 }, // Centralizado
     linkText: { color: '#007AFF', fontSize: 12, fontWeight: 'bold' }
 });

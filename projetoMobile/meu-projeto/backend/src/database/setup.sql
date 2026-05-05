@@ -3,8 +3,8 @@ CREATE TABLE IF NOT EXISTS usuarios (
     id SERIAL PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
-    documento VARCHAR(20) NOT NULL, -- CPF ou RA
-    senha VARCHAR(255) NOT NULL,   -- Armazenará texto puro por enquanto, conforme seu teste
+    documento VARCHAR(20) NOT NULL, -- RA para Alunos, CPF para outros
+    senha VARCHAR(255) NOT NULL,
     perfil VARCHAR(20) NOT NULL CHECK (perfil IN ('Adm', 'Professor', 'Aluno')),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -26,21 +26,17 @@ CREATE TABLE IF NOT EXISTS disciplinas (
     professor_id INTEGER REFERENCES professores(id) ON DELETE SET NULL
 );
 
--- 4. Criação da Tabela de Alunos (Com campos para ViaCEP)
+-- 4. Criação da Tabela de Alunos (Versão Simplificada sem ViaCEP)
 CREATE TABLE IF NOT EXISTS alunos (
     id SERIAL PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
     ra VARCHAR(20) UNIQUE NOT NULL,
-    cep VARCHAR(9),
-    logradouro VARCHAR(150),
-    bairro VARCHAR(100),
+    email VARCHAR(100) UNIQUE NOT NULL,
     cidade VARCHAR(100),
-    uf CHAR(2),
-    email VARCHAR(100) UNIQUE NOT NULL
+    data_cadastro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- 5. Inserção do Usuário Administrador Inicial para Testes
--- Nota: Senha em texto puro conforme sua última alteração de lógica
+-- 5. Inserção/Atualização do Usuário Administrador
 INSERT INTO usuarios (nome, email, documento, senha, perfil)
 VALUES (
     'Arthur Admin', 
