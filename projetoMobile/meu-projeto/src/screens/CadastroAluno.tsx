@@ -13,28 +13,23 @@ export default function CadastroAluno({ navigation }: any) {
     const [cidade, setCidade] = useState('');
 
     const handleSalvar = async () => {
+        console.log("Botão clicado! Dados:", { nome, email, ra, senha });
         // Validação básica: Nome, E-mail, RA e Senha são cruciais
         if (!nome || !email || !ra || !senha) {
-            Alert.alert("Erro", "Campos obrigatórios: Nome, E-mail, RA e Senha.");
-            return;
-        }
+        alert("Campos obrigatórios: Nome, E-mail, RA e Senha."); // No Web, 'alert' minúsculo funciona melhor
+        return;
+    }
 
-        try {
-            // Enviando para o seu backend
-            await api.post('/alunos', {
-                nome, 
-                email, 
-                ra,     // No backend, use este RA como o 'documento' na tabela usuarios
-                senha,  // Senha definida pelo ADM
-                cidade
-            });
-
-            Alert.alert("Sucesso", "Aluno cadastrado e acesso liberado!");
-            navigation.goBack();
-        } catch (error: any) {
-            const msg = error.response?.data?.error || "Erro ao conectar com o servidor";
-            Alert.alert("Erro no Cadastro", msg);
-        }
+    try {
+        const response = await api.post('/alunos', { nome, email, ra, senha, cidade });
+        console.log("Resposta do servidor:", response.data); // 👈 Log de sucesso
+        alert("Sucesso: Aluno cadastrado!");
+        navigation.goBack();
+    } catch (error: any) {
+        console.error("Erro capturado no catch:", error); // 👈 Log de erro
+        const msg = error.response?.data?.error || "Erro ao conectar com o servidor";
+        alert("Erro no Cadastro: " + msg);
+    }
     };
 
     return (

@@ -9,7 +9,7 @@ const router = Router();
  * Conforme definido na API 2 do projeto
  */
 router.post('/alunos', StudentController.create);
-
+router.get('/alunos', StudentController.index);
 /**
  * Rota para consulta de boletim por matrícula
  * GET /api/boletim/:matricula

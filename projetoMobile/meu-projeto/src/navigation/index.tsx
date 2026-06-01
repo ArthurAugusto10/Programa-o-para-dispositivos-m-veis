@@ -11,9 +11,12 @@ import SubjectRegisterScreen from '../screens/SubjectRegisterScreen';
 import ReportCardScreen from '../screens/ReportCardScreen';
 import ForgotPasswordScreen from '../screens/ForgotPasswordScreen';
 import RegisterScreen from '../screens/RegisterScreen';
+import ListaAlunos from '../screens/ListaAlunos';
+import CadastroAluno from '../screens/CadastroAluno';
 
 
 const Stack = createStackNavigator();
+
 
 export default function AppNavigation() {
   return (
@@ -81,6 +84,16 @@ export default function AppNavigation() {
           component={RegisterScreen} 
           options={{ title: 'Criar Conta' }} 
         />
+        <Stack.Screen 
+          name="CadastroAluno"
+          component={CadastroAluno} 
+          options={{ title: 'Novo Aluno' }} />
+
+        <Stack.Screen 
+          name="ListaAlunos" 
+          component={ListaAlunos} 
+          options={{ title: 'Alunos' }} />
+
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -22,21 +22,28 @@ export default function DashboardScreen({ route, navigation }: any) {
     
     
     <ScrollView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.welcomeText}>Olá, {perfilUsuario}!</Text>
-        <Text style={styles.subText}>Painel Acadêmico Scholar</Text>
-      </View>
-
       <View style={styles.menuGrid}>
-        {/* Administradores e Professores veem gestão de alunos */}
-        {(perfilUsuario === 'Adm' || perfilUsuario === 'Professor') && (
-          <MenuCard title="Alunos" icon="account-education" screen="CadastroAlunos" />
-        )}
+    {/* 1. ADMINISTRADOR E PROFESSOR: Veem a parte de Alunos */}
+    {(perfilUsuario === 'Adm' || perfilUsuario === 'Professor') && (
+        <>
+            <MenuCard title="Cadastrar Aluno" icon="account-plus" screen="CadastroAluno" />
+            <MenuCard title="Ver Alunos" icon="account-group" screen="ListaAlunos" />
+        </>
+    )}
 
+    {/* 2. APENAS ADMINISTRADOR: Vê a gestão de Professores */}
+    {perfilUsuario === 'Adm' && (
         <MenuCard title="Professores" icon="teach" screen="CadastroProfessores" />
-        <MenuCard title="Disciplinas" icon="book-open-variant" screen="CadastroDisciplinas" />
+    )}
+
+    {/* 3. TODOS: Veem as Disciplinas */}
+    <MenuCard title="Disciplinas" icon="book-open-variant" screen="CadastroDisciplinas" />
+    
+    {/* 4. APENAS ALUNOS: Veem o Boletim */}
+    {perfilUsuario === 'Aluno' && (
         <MenuCard title="Meu Boletim" icon="file-document-outline" screen="VisualizacaoBoletim" />
-      </View>
+    )}
+</View>
 
       <TouchableOpacity 
         style={styles.logoutButton} 
@@ -44,6 +51,7 @@ export default function DashboardScreen({ route, navigation }: any) {
       >
         <Text style={styles.logoutText}>Sair do Sistema</Text>
       </TouchableOpacity>
+
     </ScrollView>
   );
 }
@@ -66,5 +74,29 @@ const styles = StyleSheet.create({
   },
   cardText: { marginTop: 10, fontSize: 14, fontWeight: '600', color: '#444' },
   logoutButton: { margin: 20, padding: 15, alignItems: 'center', borderRadius: 10, backgroundColor: '#fee' },
-  logoutText: { color: 'red', fontWeight: 'bold' }
+  logoutText: { color: 'red', fontWeight: 'bold' },
+  cardAdmin: { 
+        backgroundColor: '#fff', 
+        padding: 20, 
+        borderRadius: 12, 
+        marginTop: 15,
+        marginBottom: 15,
+        borderLeftWidth: 5,
+        borderLeftColor: '#007AFF', // Azul para destacar que é uma ação do Admin
+        elevation: 3, // Sombra no Android
+        shadowColor: '#000', // Sombra no iOS
+        shadowOpacity: 0.1,
+        shadowRadius: 5,
+        shadowOffset: { width: 0, height: 2 }
+    },
+    cardTitle: { 
+        fontSize: 16, 
+        fontWeight: 'bold', 
+        color: '#333' 
+    },
+    cardDesc: { 
+        fontSize: 13, 
+        color: '#777', 
+        marginTop: 5 
+    }
 });
