@@ -10,7 +10,7 @@ export default function CadastroAluno({ navigation }: any) {
     const [email, setEmail] = useState('');
     const [ra, setRa] = useState('');
     const [senha, setSenha] = useState('');
-    const [cidade, setCidade] = useState('');
+    
 
     const handleSalvar = async () => {
         console.log("Botão clicado! Dados:", { nome, email, ra, senha });
@@ -21,7 +21,7 @@ export default function CadastroAluno({ navigation }: any) {
     }
 
     try {
-        const response = await api.post('/alunos', { nome, email, ra, senha, cidade });
+        const response = await api.post('/alunos', { nome, email, ra, senha });
         console.log("Resposta do servidor:", response.data); // 👈 Log de sucesso
         alert("Sucesso: Aluno cadastrado!");
         navigation.goBack();
@@ -70,12 +70,6 @@ export default function CadastroAluno({ navigation }: any) {
                 placeholder="Defina a senha inicial do aluno" 
             />
 
-            <CustomInput 
-                label="Cidade (Opcional)" 
-                value={cidade} 
-                onChangeText={setCidade} 
-                placeholder="Cidade do aluno" 
-            />
 
             <View style={{ marginTop: 20 }}>
                 <CustomButton title="Confirmar Cadastro" onPress={handleSalvar} color={Colors.primary} />

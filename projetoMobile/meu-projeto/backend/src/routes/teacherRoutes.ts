@@ -3,10 +3,9 @@ import TeacherController from '../controllers/TeacherController';
 
 const router = Router();
 
-// Endpoint para Cadastro de Professores 
-router.post('/professores', TeacherController.create);
 
-// Endpoint opcional para listagem
-router.get('/professores', TeacherController.list);
+router.post('/professores', TeacherController.create);
+router.get('/professores', TeacherController.index); 
+router.get('/professores/:email/disciplinas', TeacherController.getClasses);
 
 export default router;

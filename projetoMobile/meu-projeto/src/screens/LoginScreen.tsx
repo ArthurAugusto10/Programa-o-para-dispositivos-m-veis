@@ -31,7 +31,13 @@ export default function LoginScreen({ navigation }: any) {
             console.log(`Login realizado como ${usuario.perfil}:`, usuario.nome);
 
             // O perfil retornado pelo banco define o que o usuário verá no Dashboard
-            navigation.navigate('Dashboard', { perfilUsuario: usuario.perfil });
+            // O perfil retornado pelo banco e o e-mail digitado definem o que o usuário verá no Dashboard
+            navigation.navigate('Dashboard', {
+                perfilUsuario: usuario.perfil,
+                emailUsuario: email,
+                nomeUsuario: usuario.nome
+                // 🎯 Enviando o e-mail e o nome para o Dashboard rastrear!
+            });
 
         } catch (error: any) {
             console.error('Erro ao acessar:', error);

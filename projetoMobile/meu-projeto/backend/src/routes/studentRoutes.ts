@@ -3,18 +3,7 @@ import StudentController from '../controllers/StudentController';
 
 const router = Router();
 
-/**
- * Rota para cadastrar um novo aluno
- * POST /api/alunos
- * Conforme definido na API 2 do projeto
- */
-router.post('/alunos', StudentController.create);
-router.get('/alunos', StudentController.index);
-/**
- * Rota para consulta de boletim por matrícula
- * GET /api/boletim/:matricula
- * Conforme definido na API 3 do projeto
- */
-router.get('/boletim/:matricula', StudentController.getReportCard);
+router.post('/alunos', StudentController.create); // Garanta que aponta para 'create' ou 'store'
+router.get('/alunos', StudentController.index);   // 👈 Linha 18: Deve apontar exatamente para .index
 
 export default router;

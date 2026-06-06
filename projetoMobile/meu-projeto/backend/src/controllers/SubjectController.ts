@@ -1,63 +1,50 @@
-import type { Request, Response } from 'express';
-import { query } from '../database/index';
-import type { Disciplina } from '../models/Disciplina';
+import { Request, Response } from 'express';
+import { pool } from '../database';
 
 class SubjectController {
-  // Rota POST /api/disciplinas [cite: 99]
-  async create(req: Request, res: Response) {
-    const { 
-      nome, 
-      carga_horaria, 
-      professor_id, 
-      curso, 
-      semestre 
-    }: Disciplina = req.body;
+    // 1. Cadastrar Disciplina
+    async create(req: Request, res: Response) {
+        const { nome, carga_horaria, professor_id } = req.body;
 
-    // Validação de campos obrigatórios [cite: 60-64]
-    if (!nome || !carga_horaria || !professor_id || !curso || !semestre) {
-      return res.status(400).json({ error: 'Todos os campos da disciplina são obrigatórios.' });
+        // Validação dos campos obrigatórios conforme o setup.sql
+        if (!nome || !carga_horaria) {
+            return res.status(400).json({ error: "Nome e Carga Horária são obrigatórios." });
+        }
+
+        try {
+            const queryText = `
+                INSERT INTO disciplinas (nome, carga_horaria, professor_id)
+                VALUES ($1, $2, $3)
+                RETURNING id, nome, carga_horaria, professor_id;
+            `;
+            // Se nenhum professor for selecionado, passa null (já que a tabela aceita NULL)
+            const values = [nome, Number(carga_horaria), professor_id || null];
+            
+            const result = await pool.query(queryText, values);
+            return res.status(201).json(result.rows[0]);
+
+        } catch (error: any) {
+            console.error("Erro ao cadastrar disciplina:", error);
+            return res.status(500).json({ error: `Erro no Banco: ${error.message}` });
+        }
     }
 
-    try {
-      // Verifica se o professor informado existe no banco antes de cadastrar a disciplina
-      const teacherCheck = await query('SELECT id FROM professores WHERE id = $1', [professor_id]);
-      
-      if (teacherCheck.rowCount === 0) {
-        return res.status(404).json({ error: 'O professor informado não existe.' });
-      }
-
-      const sql = `
-        INSERT INTO disciplinas (nome, carga_horaria, professor_id, curso, semestre)
-        VALUES ($1, $2, $3, $4, $5) RETURNING *`;
-      
-      const values = [nome, carga_horaria, professor_id, curso, semestre];
-      const result = await query(sql, values);
-
-      return res.status(201).json({ 
-        message: 'Disciplina vinculada e cadastrada com sucesso!', 
-        disciplina: result.rows[0] 
-      });
-    } catch (err) {
-      console.error(err);
-      return res.status(500).json({ error: 'Erro ao cadastrar disciplina no sistema.' });
+    // 2. Listar Disciplinas (Trazendo o nome do professor acoplado)
+    async index(req: Request, res: Response) {
+        try {
+            const queryText = `
+                SELECT d.id, d.nome, d.carga_horaria, p.nome AS professor_nome 
+                FROM disciplinas d
+                LEFT JOIN professores p ON d.professor_id = p.id
+                ORDER BY d.nome ASC
+            `;
+            const result = await pool.query(queryText);
+            return res.json(result.rows);
+        } catch (error: any) {
+            console.error("Erro ao buscar disciplinas:", error);
+            return res.status(500).json({ error: 'Erro ao buscar disciplinas.' });
+        }
     }
-  }
-
-  // Lista disciplinas trazendo o nome do professor (JOIN)
-  async listAll(req: Request, res: Response) {
-    try {
-      const sql = `
-        SELECT d.*, p.nome as nome_professor 
-        FROM disciplinas d
-        INNER JOIN professores p ON p.id = d.professor_id
-        ORDER BY d.nome ASC`;
-      
-      const result = await query(sql);
-      return res.json(result.rows);
-    } catch (err) {
-      return res.status(500).json({ error: 'Erro ao listar disciplinas.' });
-    }
-  }
 }
 
 export default new SubjectController();

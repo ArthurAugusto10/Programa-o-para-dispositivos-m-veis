@@ -1,17 +1,28 @@
-import React from 'react';
+import React, { useEffect } from 'react'; // 🎯 Importado o useEffect aqui!
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Colors } from '../styles/globalStyles';
 
 export default function DashboardScreen({ route, navigation }: any) {
-  // Captura o perfil selecionado no Login (Padrão Aluno)
-  const { perfilUsuario } = route.params || { perfilUsuario: 'Aluno' };
+  // 🎯 Agora capturamos o perfil, e-mail E o nome do usuário vindo do Login
+  const { perfilUsuario, emailUsuario, nomeUsuario } = route.params || { 
+    perfilUsuario: 'Aluno', 
+    emailUsuario: '', 
+    nomeUsuario: 'Usuário' 
+  };
 
-  // Componente de Card reutilizável que envia o perfil para a próxima tela
+  // 🎯 Atualiza o título da barra azul (TopBar) dinamicamente ao carregar a tela
+  useEffect(() => {
+    navigation.setOptions({
+      title: `Bem vindo, ${nomeUsuario}`
+    });
+  }, [navigation, nomeUsuario]);
+
+  // Componente de Card reutilizável atualizado para repassar perfil e e-mail
   const MenuCard = ({ title, icon, screen }: { title: string, icon: any, screen: string }) => (
     <TouchableOpacity 
       style={styles.card} 
-      onPress={() => navigation.navigate(screen, { perfilUsuario })}
+      onPress={() => navigation.navigate(screen, { perfilUsuario, emailUsuario, nomeUsuario })}
     >
       <MaterialCommunityIcons name={icon} size={40} color={Colors.primary} />
       <Text style={styles.cardText}>{title}</Text>
@@ -19,45 +30,52 @@ export default function DashboardScreen({ route, navigation }: any) {
   );
 
   return (
-    
-    
     <ScrollView style={styles.container}>
       <View style={styles.menuGrid}>
-    {/* 1. ADMINISTRADOR E PROFESSOR: Veem a parte de Alunos */}
-    {(perfilUsuario === 'Adm' || perfilUsuario === 'Professor') && (
-        <>
+        
+        {/* 🛡️ REGRAS PARA O ADMINISTRADOR (Vê e faz tudo) */}
+        {perfilUsuario === 'Adm' && (
+          <>
+            {/* Alunos */}
             <MenuCard title="Cadastrar Aluno" icon="account-plus" screen="CadastroAluno" />
             <MenuCard title="Ver Alunos" icon="account-group" screen="ListaAlunos" />
-        </>
-    )}
 
-    {/* 2. APENAS ADMINISTRADOR: Vê a gestão de Professores */}
-    {perfilUsuario === 'Adm' && (
-        <MenuCard title="Professores" icon="teach" screen="CadastroProfessores" />
-    )}
+            <MenuCard title="Matricular Aluno" icon="link-variant" screen="MatricularAluno" />
+            
+            {/* Professores */}
+            <MenuCard title="Cadastrar Professor" icon="school" screen="CadastroProfessor" />
+            <MenuCard title="Ver Professores" icon="card-account-details" screen="ListaProfessores" />
 
-    {/* 3. TODOS: Veem as Disciplinas */}
-    <MenuCard title="Disciplinas" icon="book-open-variant" screen="CadastroDisciplinas" />
-    
-    {/* 4. APENAS ALUNOS: Veem o Boletim */}
-    {perfilUsuario === 'Aluno' && (
-        <MenuCard title="Meu Boletim" icon="file-document-outline" screen="VisualizacaoBoletim" />
-    )}
-</View>
+            {/* Disciplinas */}
+            <MenuCard title="Cadastrar Disciplina" icon="book-plus" screen="CadastroDisciplina" />
+            <MenuCard title="Ver Disciplinas" icon="book-open-variant" screen="ListaDisciplinas" />
+          </>
+        )}
 
-      <TouchableOpacity 
-        style={styles.logoutButton} 
-        onPress={() => navigation.navigate('Login')}
-      >
-        <Text style={styles.logoutText}>Sair do Sistema</Text>
-      </TouchableOpacity>
+        {/* 👨‍🏫 REGRAS PARA O PROFESSOR (Visão restrita) */}
+        {perfilUsuario === 'Professor' && (
+          <>
+            <MenuCard title="Minhas Disciplinas" icon="book-open-variant" screen="ListaDisciplinas" />
+            <MenuCard title="Lançar Notas" icon="notebook-edit" screen="LancamentoNotas" />
+            <MenuCard title="Ver Notas Lançadas" icon="file-document-multiple" screen="VisualizarNotas" />
+          </>
+        )}
 
+        {/* 👨‍🎓 REGRAS PARA O ALUNO */}
+        {perfilUsuario === 'Aluno' && (
+          <>
+            <MenuCard title="Ver Minhas Notas" icon="file-certificate" screen="Boletim" />
+            <MenuCard title="Grade & Professores" icon="account-group" screen="MinhaGrade" />
+          </>
+        )}
+
+      </View>
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, experimental_backgroundImage: '#f0f2f5' },
+  container: { flex: 1, backgroundColor: '#121212' }, 
   header: { padding: 25, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#eee' },
   welcomeText: { fontSize: 22, fontWeight: 'bold', color: Colors.primary },
   subText: { fontSize: 14, color: '#666' },
@@ -72,31 +90,23 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     elevation: 3
   },
-  cardText: { marginTop: 10, fontSize: 14, fontWeight: '600', color: '#444' },
+  cardText: { marginTop: 10, fontSize: 14, fontWeight: '600', color: '#fff' }, 
   logoutButton: { margin: 20, padding: 15, alignItems: 'center', borderRadius: 10, backgroundColor: '#fee' },
   logoutText: { color: 'red', fontWeight: 'bold' },
   cardAdmin: { 
-        backgroundColor: '#fff', 
-        padding: 20, 
-        borderRadius: 12, 
-        marginTop: 15,
-        marginBottom: 15,
-        borderLeftWidth: 5,
-        borderLeftColor: '#007AFF', // Azul para destacar que é uma ação do Admin
-        elevation: 3, // Sombra no Android
-        shadowColor: '#000', // Sombra no iOS
-        shadowOpacity: 0.1,
-        shadowRadius: 5,
-        shadowOffset: { width: 0, height: 2 }
-    },
-    cardTitle: { 
-        fontSize: 16, 
-        fontWeight: 'bold', 
-        color: '#333' 
-    },
-    cardDesc: { 
-        fontSize: 13, 
-        color: '#777', 
-        marginTop: 5 
-    }
+    backgroundColor: '#fff', 
+    padding: 20, 
+    borderRadius: 12, 
+    marginTop: 15,
+    marginBottom: 15,
+    borderLeftWidth: 5,
+    borderLeftColor: '#007AFF',
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    shadowOffset: { width: 0, height: 2 }
+  },
+  cardTitle: { fontSize: 16, fontWeight: 'bold', color: '#333' },
+  cardDesc: { fontSize: 13, color: '#777', marginTop: 5 }
 });
