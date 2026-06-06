@@ -68,9 +68,10 @@ VALUES ('Arthur Admin', 'adm@fatec.sp.gov.br', '123456', 'fatec123', 'Adm')
 ON CONFLICT (email) DO UPDATE SET documento = EXCLUDED.documento, senha = EXCLUDED.senha;
 
 -- Insere o Professor Silvano (Na tabela de login e na de professores)
+-- 🎯 VERSÃO CORRIGIDA:
 INSERT INTO usuarios (nome, email, documento, senha, perfil)
 VALUES ('Silvano', 'silvano@techal.com', '019283', 'silvano123', 'Professor')
-ON CONFLICT (email) DO TEXT;
+ON CONFLICT (email) DO UPDATE SET documento = EXCLUDED.documento;
 
 INSERT INTO professores (nome, email, especialidade)
 VALUES ('Silvano', 'silvano@techal.com', 'Internet das Coisas')
